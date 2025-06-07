@@ -1,0 +1,32 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+    <title>All Feedback</title>
+    <style>
+        body { padding-top: 5rem; }
+        .container { max-width: 800px; }
+        .card { margin-bottom: 1rem; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1 class="mb-4 text-center">Submitted Feedback</h1>
+        {% if feedback %}
+            {% for entry in feedback|reverse %}
+            <div class="card">
+                <div class="card-body">
+                    <h5 class="card-title">{{ entry.name }}</h5>
+                    <p class="card-text">{{ entry.message }}</p>
+                </div>
+            </div>
+            {% endfor %}
+        {% else %}
+            <p class="text-center">No feedback submitted yet.</p>
+        {% endif %}
+        <p class="text-center mt-3"><a href="/" class="btn btn-primary">Back to Form</a></p>
+    </div>
+</body>
+</html>
