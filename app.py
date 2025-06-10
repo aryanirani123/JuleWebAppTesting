@@ -1,13 +1,21 @@
 from flask import Flask, render_template, request, redirect
-# Removed: import json
-# Removed: import os
-from firestore_service import add_feedback, get_feedback # Added
+import json
+import os
 
 app = Flask(__name__)
-# Removed: FEEDBACK_FILE = 'feedback.json'
+FEEDBACK_FILE = 'feedback.json'
 
-# Removed: load_feedback() function
-# Removed: save_feedback() function
+def load_feedback():
+    if os.path.exists(FEEDBACK_FILE):
+        with open(FEEDBACK_FILE, 'r') as f:
+            return json.load(f)
+    return []
+
+def save_feedback(name, message):
+    feedback = load_feedback()
+    feedback.append({'name': name, 'message': message})
+    with open(FEEDBACK_FILE, 'w') as f:
+        json.dump(feedback, f, indent=2)
 
 @app.route('/')
 def index():
@@ -17,25 +25,13 @@ def index():
 def submit():
     name = request.form['name']
     message = request.form['message']
-    try:
-        add_feedback(name, message) # Changed
-    except ValueError as e:
-        # Handle potential errors from add_feedback, e.g., empty name/message
-        # You might want to flash a message to the user or render an error page
-        print(f"Error submitting feedback: {e}") # Or use proper logging
-        # For now, just redirecting, but in a real app, provide user feedback
-        return redirect('/') # Or to a page indicating an error
+    save_feedback(name, message)
     return redirect('/feedback')
 
 @app.route('/feedback')
 def feedback():
-    try:
-        feedback_items = get_feedback() # Changed
-    except Exception as e:
-        # Handle potential errors from get_feedback
-        print(f"Error fetching feedback: {e}") # Or use proper logging
-        feedback_items = [] # Present an empty list on error
-    return render_template('feedback.html', feedback=feedback_items) # Changed variable name
+    feedback = load_feedback()
+    return render_template('feedback.html', feedback=feedback)
 
 if __name__ == '__main__':
     app.run(debug=True)
